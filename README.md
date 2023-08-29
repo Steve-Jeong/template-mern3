@@ -102,3 +102,4 @@
    ```
 
    It should show `json message` on the cli.
+   test
