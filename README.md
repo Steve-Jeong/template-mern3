@@ -435,15 +435,73 @@
       redisClient.on('ready', ()=>console.log('connected to redis...'))
       async function connectRedis() {
          await redisClient.connect().catch(console.error)
-
-         await redisClient.set('my_key', 'my value');
-         const value = await redisClient.get('my_key');
-         console.log('my_key : ', value)
       }
       connectRedis()
    ```
 
-4) Check if the redis connection is displayed.
+5) Check if the redis connection is displayed.
    ```bash
       docker logs mern-api-1 -f
    ```
+
+6) Add auth related codes in the models, controllers, routes directory and setup the necessary code in the index.js in the api folder.
+
+7) Test Post API using mongodb as follows
+   POST signUp
+      localhost:3000/api/v1/auth/signup
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   POST login
+      localhost:3000/api/v1/auth/login
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   GET list all users
+      localhost:3000/api/v1/auth/
+
+      Body
+      raw (javascript)
+      javascript
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   DELETE delete a user
+      localhost:3000/api/v1/auth/delete
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Michae",
+         "password":"mypassword"
+      }
+
+8) After login, user information is added by the following code in the authController's login function.
+   ```javascript
+      req.session.user = user
+   ```
+
+9) After login, you can enter into redis container, and check the session id.
+   ```
+      docker exec -it mern-redis-1 redis-cli
+      in the redis-cli
+         keys * -> you will get the various keys including the key start with 'my-sess'. That is the session id resulted from the login, which is valid only 30 seconds to show that the session id is deleted in short time.
+         get [the key start with 'my-sess'] -> You will get the session id details. After 30 seconds, it will show '(nil)'
+   ```
+
+   
