@@ -161,3 +161,157 @@
    ```
 
    It should enter into the mongodb without any error message.
+
+
+### Front-1. Create front directory and make initial Dockerfile in the front directory
+1) Dockerfile
+   ```Dockerfile
+      FROM node:20.5.1-bookworm-slim
+      USER node
+      WORKDIR /app
+   ```
+
+2) Then, in the front directory terminal run
+   ```bash
+      docker build -t front .
+   ```
+
+3) Enter into the docker container
+   ```bash
+      docker run -it -v $(pwd):/app --name front-1 front sh   
+   ```
+
+   In the container, initialize the react vite. But if there is any file in the directory where the react vite is installed, it emits error. So, tentantively move the Dockerfile fromt the front directory to the MERN home directory in the separate host terminal.
+
+   ```bash
+      # in the host directory
+      ~/MERN $ cd front
+      ~/MERN/front $ mv Dockerfile ..
+
+      # in the container
+      $ npm create vite@latest
+      # in the project name question, type "." so that the react vite is installed in the front directory. And then, choose appropriate framework and its variant
+      $ npm install
+
+      # in the host directory
+      ~/MERN $ mv Dockerfile front/
+
+      # move the content of .gitignore file in the front directory to .gitignore file in the home directory, and delete .gitignore.
+   ```
+
+4) In the vscode front directory, change vite.config.js as follows
+   ```javascript
+      import { defineConfig } from 'vite'
+      import react from '@vitejs/plugin-react'
+
+      // https://vitejs.dev/config/
+      export default defineConfig({
+         plugins: [react()],
+         server: {
+            watch: {
+               usePolling: true
+            },
+            host: true,
+            strictPort: true,
+            port: 5173
+         }
+      })
+   ```
+
+   In the front-1 container, run the following.
+   ```bash
+      $ npm run dev      
+   ```
+
+   If you followed correctly up to this point, if you run `npm run dev`, it should show running message of react vite. Press Ctrl+C to stop react vite.
+
+5) In the host terminal, move back the Dockerfile to the front directory
+   ```bash
+      # in the host directory
+      ~/MERN $ cd Dockerfile ./front
+   ```
+
+6) Exit from the front container
+
+
+
+### FRONT-2. Update the Dockerfile in the front directory to the final version
+1) Dockerfile
+   ```diff
+      FROM node:20.5.1-bookworm-slim
+      USER node
+      WORKDIR /app
+   +  COPY --chown=node:node package*.json ./
+   +  RUN npm ci
+   +  COPY --chown=node:node ./ ./
+   +  CMD [ "npm", "run", "dev" ]
+   ```
+
+   From above `--chown=node:node` changes the permission of the files from the root user to node user.
+
+2) Add .dockerignore file.
+   ```.dockerignore
+      node_modules
+   ```
+
+3) Build the api docker image again. 
+   ```bash
+      docker build -t front .
+   ```
+
+4) Run the container, and test if it is working
+   ```bash
+      docker run -d -p 5173:5173 -v $(pwd):/app -v /app/node_modules --name front-1 front
+      curl localhost:5173
+   ```
+
+   It should show `Vite + React html script` on the cli.
+
+5) Stop the container
+   ```
+      docker rm front-1 -f
+   ```
+
+6) Add front stack to the docker-compose.yml in the home directory.
+   ```diff
+      version: '3.9'
+      services:
+         api:
+            build: 
+               context: ./api
+            ports:
+               - 3000:3000
+            volumes:
+               - ./api:/app
+               - /app/node_modules
+
+   +     front:
+   +        build: 
+   +           context: ./front
+   +        ports:
+   +           - 5173:5173
+   +        volumes:
+   +           - ./front:/app
+   +           - /app/node_modules
+         
+         mongodb:
+            image: mongo:6
+            environment:
+               - MONGO_INITDB_ROOT_USERNAME=sanjeev
+               - MONGO_INITDB_ROOT_PASSWORD=mypassword
+            volumes:
+               - mongo-db:/data/db
+    
+      volumes:
+         mongo-db:
+   ```
+
+7) In the home directory run the followings, and check if it is working as the same as before.
+   ```bash
+      docker compose up -d --build
+      curl localhost:3000
+      curl localhost:5173
+      docker exec -it mern-mongodb-1 mongosh -u sanjeev -p mypassword
+   ```
+
+8) If all are working well, run 'docker compose down' for the next step.
