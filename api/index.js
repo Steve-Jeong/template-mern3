@@ -17,6 +17,20 @@ const app = express()
 
 app.use(express.json())
 
+// connect to Redis
+const redis = require('redis')
+let redisClient = redis.createClient({url:'redis://redis:6379'})
+redisClient.on('error', (err)=>console.log('redis error : ', err))
+redisClient.on('ready', ()=>console.log('connected to redis...'))
+async function connectRedis() {
+  await redisClient.connect().catch(console.error)
+
+  // await redisClient.set('my_key', 'my value');
+  // const value = await redisClient.get('my_key');
+  // console.log('my_key : ', value)
+}
+connectRedis()
+
 // routes
 app.get('/', (req, res) => {
   res.status(200).json({

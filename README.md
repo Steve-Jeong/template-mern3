@@ -375,3 +375,75 @@
 
    DELETE delete a post
       localhost:3000/api/v1/post/64b1e2cf7f9c48205992d2f7
+
+
+
+### Authentication with REDIS
+1) Run docker compose and enter into api container shell, and install redis, connect-redis, express-session.
+   ```bash
+      docker compose up -d --build
+      docker exec -it mern-api-1 sh
+      -> in the api container
+         npm i redis connect-redis express-session
+   ```
+
+2) Add Redis container in the docker-compose.yml
+   ```diff
+      version: '3.9'
+      services:
+      api:
+         build: 
+            context: ./api
+         ports:
+            - 3000:3000
+         volumes:
+            - ./api:/app
+            - /app/node_modules
+      
+      front:
+         build: 
+            context: ./front
+         ports:
+            - 5173:5173
+         volumes:
+            - ./front:/app
+            - /app/node_modules
+      
+      mongodb:
+         image: mongo:6
+         environment:
+            - MONGO_INITDB_ROOT_USERNAME=sanjeev
+            - MONGO_INITDB_ROOT_PASSWORD=mypassword
+         volumes:
+            - mongo-db:/data/db
+
+   +  redis:
+   +     image: redis:7.0.10
+
+      volumes:
+         mongo-db:
+   ```
+
+3) Close docker compose with 'docker compose down', and run again with 'docker compose up -d --build'
+
+4) Add connection string to index.js in the api directory.
+   ```javascript
+      // connect to Redis
+      const redis = require('redis')
+      let redisClient = redis.createClient({url:'redis://redis:6379'})
+      redisClient.on('error', (err)=>console.log('redis error : ', err))
+      redisClient.on('ready', ()=>console.log('connected to redis...'))
+      async function connectRedis() {
+         await redisClient.connect().catch(console.error)
+
+         await redisClient.set('my_key', 'my value');
+         const value = await redisClient.get('my_key');
+         console.log('my_key : ', value)
+      }
+      connectRedis()
+   ```
+
+4) Check if the redis connection is displayed.
+   ```bash
+      docker logs mern-api-1 -f
+   ```
