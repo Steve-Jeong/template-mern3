@@ -1,3 +1,8 @@
+const mongoose = require('mongoose')
+mongoose.connect('mongodb://sanjeev:mypassword@mongodb:27017/mydb?authSource=admin')
+  .then(()=>console.log('connected to mongodb'))
+  .catch((err)=>console.log('error connecting to mongodb : ', err))
+  
 const express = require('express')
 const app = express()
 

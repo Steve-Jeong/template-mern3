@@ -315,3 +315,29 @@
    ```
 
 8) If all are working well, run 'docker compose down' for the next step.
+
+
+
+### MongoDB API - POST API
+1) Run docker compose and enter into api container shell, and install mongoose.
+   ```bash
+      docker compose up -d --build
+      docker exec -it mern-api-1 sh
+      -> in the api container
+         npm i mongoose
+   ```
+
+2) Close docker compose with 'docker compose down', and run again with 'docker compose up -d --build'
+
+3) Add connection string to index.js in the api directory.
+   ```javascript
+      const mongoose = require('mongoose')
+      mongoose.connect('mongodb://sanjeev:mypassword@mongodb:27017/mydb?authSource=admin')
+         .then(()=>console.log('connected to mongodb'))
+         .catch((err)=>console.log('error connecting to mongodb : ', err))
+   ```
+
+4) Check if the mongo connection is displayed.
+   ```bash
+      docker logs mern-api-1 -f
+   ```
