@@ -1,17 +1,32 @@
+// connect to Mongo
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://sanjeev:mypassword@mongodb:27017/mydb?authSource=admin')
-  .then(()=>console.log('connected to mongodb'))
-  .catch((err)=>console.log('error connecting to mongodb : ', err))
-  
+
+function connectMongo() {
+  mongoose.connect('mongodb://sanjeev:mypassword@mongodb:27017/mydb?authSource=admin')
+    .then(()=>console.log('successfully connected to mongodb'))
+    .catch(e=>{
+      console.log('error occurred in connecting to db : ', e)
+      setTimeout(connectMongo, 5000)
+    })
+}
+connectMongo()
+
+// express setup
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
+// routes
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Hello World'
   })
 })
+
+const postRouter = require('./routes/postRouter')
+app.use('/api/v1/post', postRouter)
 
 app.listen(3000, () => {
   console.log('app is listening on port 3000')

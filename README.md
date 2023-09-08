@@ -341,3 +341,6 @@
    ```bash
       docker logs mern-api-1 -f
    ```
+
+5) Add models, controllers, routes directory and setup the necessary code.
+
