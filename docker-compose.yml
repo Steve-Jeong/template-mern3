@@ -2,10 +2,20 @@ version: '3.9'
 services:
   api:
     build: 
-       context: ./api
+      context: ./api
     ports:
-       - 3000:3000
+      - 3000:3000
     volumes:
-       - ./api:/app
-       - /app/node_modules
+      - ./api:/app
+      - /app/node_modules
 
+  mongodb:
+    image: mongo:6
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=sanjeev
+      - MONGO_INITDB_ROOT_PASSWORD=mypassword
+    volumes:
+      - mongo-db:/data/db
+
+volumes:
+  mongo-db:
