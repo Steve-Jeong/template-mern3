@@ -8,7 +8,16 @@ services:
     volumes:
       - ./api:/app
       - /app/node_modules
-
+  
+  front:
+    build: 
+      context: ./front
+    ports:
+      - 5173:5173
+    volumes:
+      - ./front:/app
+      - /app/node_modules
+  
   mongodb:
     image: mongo:6
     environment:
@@ -18,4 +27,4 @@ services:
       - mongo-db:/data/db
 
 volumes:
-  mongo-db:
+   mongo-db:
