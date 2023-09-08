@@ -344,3 +344,34 @@
 
 5) Add models, controllers, routes directory and setup the necessary code.
 
+6) Test Post API using mongodb as follows
+   POST create a post
+      localhost:3000/api/v1/post
+
+      Body
+      raw (json)
+      json
+      {
+         "title": "The Lord of the Ring",
+         "body": "body of The Lord of the Ring"
+      }
+
+   GET get a request
+      localhost:3000/api/v1/post/64b1e2cf7f9c48205992d2f7
+
+   GET get all posts
+      localhost:3000/api/v1/post
+
+   PATCH update a post
+      localhost:3000/api/v1/post/64b1e2cf7f9c48205992d2f7
+
+      Body
+      raw (json)
+      json
+      {
+         "title": "Harry Potter 2",
+         "body": "body of Harry Potter 2"
+      }
+
+   DELETE delete a post
+      localhost:3000/api/v1/post/64b1e2cf7f9c48205992d2f7
