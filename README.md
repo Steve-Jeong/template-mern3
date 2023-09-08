@@ -375,3 +375,133 @@
 
    DELETE delete a post
       localhost:3000/api/v1/post/64b1e2cf7f9c48205992d2f7
+
+
+
+### Authentication with REDIS
+1) Run docker compose and enter into api container shell, and install redis, connect-redis, express-session.
+   ```bash
+      docker compose up -d --build
+      docker exec -it mern-api-1 sh
+      -> in the api container
+         npm i redis connect-redis express-session
+   ```
+
+2) Add Redis container in the docker-compose.yml
+   ```diff
+      version: '3.9'
+      services:
+      api:
+         build: 
+            context: ./api
+         ports:
+            - 3000:3000
+         volumes:
+            - ./api:/app
+            - /app/node_modules
+      
+      front:
+         build: 
+            context: ./front
+         ports:
+            - 5173:5173
+         volumes:
+            - ./front:/app
+            - /app/node_modules
+      
+      mongodb:
+         image: mongo:6
+         environment:
+            - MONGO_INITDB_ROOT_USERNAME=sanjeev
+            - MONGO_INITDB_ROOT_PASSWORD=mypassword
+         volumes:
+            - mongo-db:/data/db
+
+   +  redis:
+   +     image: redis:7.0.10
+
+      volumes:
+         mongo-db:
+   ```
+
+3) Close docker compose with 'docker compose down', and run again with 'docker compose up -d --build'
+
+4) Add connection string to index.js in the api directory.
+   ```javascript
+      // connect to Redis
+      const redis = require('redis')
+      let redisClient = redis.createClient({url:'redis://redis:6379'})
+      redisClient.on('error', (err)=>console.log('redis error : ', err))
+      redisClient.on('ready', ()=>console.log('connected to redis...'))
+      async function connectRedis() {
+         await redisClient.connect().catch(console.error)
+      }
+      connectRedis()
+   ```
+
+5) Check if the redis connection is displayed.
+   ```bash
+      docker logs mern-api-1 -f
+   ```
+
+6) Add auth related codes in the models, controllers, routes directory and setup the necessary code in the index.js in the api folder.
+
+7) Test Post API using mongodb as follows
+   POST signUp
+      localhost:3000/api/v1/auth/signup
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   POST login
+      localhost:3000/api/v1/auth/login
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   GET list all users
+      localhost:3000/api/v1/auth/
+
+      Body
+      raw (javascript)
+      javascript
+      {
+         "username": "Steve66",
+         "password":"mypassword"
+      }
+
+   DELETE delete a user
+      localhost:3000/api/v1/auth/delete
+
+      Body
+      raw (json)
+      json
+      {
+         "username": "Michae",
+         "password":"mypassword"
+      }
+
+8) After login, user information is added by the following code in the authController's login function.
+   ```javascript
+      req.session.user = user
+   ```
+
+9) After login, you can enter into redis container, and check the session id.
+   ```
+      docker exec -it mern-redis-1 redis-cli
+      in the redis-cli
+         keys * -> you will get the various keys including the key start with 'my-sess'. That is the session id resulted from the login, which is valid only 30 seconds to show that the session id is deleted in short time.
+         get [the key start with 'my-sess'] -> You will get the session id details. After 30 seconds, it will show '(nil)'
+   ```
+
+   
