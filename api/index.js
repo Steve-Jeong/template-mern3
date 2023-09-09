@@ -1,8 +1,21 @@
+// environment variables
+const dotenv = require('dotenv');
+
+// Load environment variables from the parent directory's .env file
+dotenv.config();
+const user = process.env.MONGO_USER;
+const password = process.env.MONGO_PASSWORD;
+const mongoIP = process.env.MONGO_IP;
+const mongoPort = process.env.MONGO_PORT;
+
+// console.log('mongo ip : ', mongoIP);
+// console.log('mongo port : ', mongoPort)
+
 // connect to Mongo
 const mongoose = require('mongoose')
 
 function connectMongo() {
-  mongoose.connect('mongodb://sanjeev:mypassword@mongodb:27017/mydb?authSource=admin')
+  mongoose.connect(`mongodb://${user}:${password}@${mongoIP}:${mongoPort}/mydb?authSource=admin`)
     .then(()=>console.log('successfully connected to mongodb'))
     .catch(e=>{
       console.log('error occurred in connecting to db : ', e)
@@ -68,6 +81,9 @@ app.use('/api/v1/post', postRouter)
 const authRouter = require('./routes/authRouter')
 app.use('/api/v1/auth', authRouter)
 
-app.listen(3000, () => {
-  console.log('app is listening on port 3000')
+// server listening
+const port = process.env.NODE_PORT || 3000
+// console.log('NODE_PORT : ', process.env.NODE_PORT)
+app.listen(port, ()=>{
+    console.log(`App is listening on port ${port}`)
 })

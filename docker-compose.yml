@@ -4,7 +4,7 @@ services:
     build: 
       context: ./api
     ports:
-      - 3000:3000
+      - ${HOST_PORT}:${NODE_PORT}
     volumes:
       - ./api:/app
       - /app/node_modules
@@ -13,7 +13,7 @@ services:
     build: 
       context: ./front
     ports:
-      - 5173:5173
+      - ${REACT_HOST_PORT}:${REACT_PORT}
     volumes:
       - ./front:/app
       - /app/node_modules
