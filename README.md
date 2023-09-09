@@ -505,3 +505,11 @@
    ```
 
    
+### Environment Variables setting
+1) The environment variable in .env can be used in the docker-compose.yml
+2) The environment variables used in the api directory should be in the api directory.
+3) The connection statement for Mongo was revised to use environment variables using template literal string.
+4) Since .env file is not traced by the Git, the template file was made to show the developer what kind of environment variables are being used.
+5) .enf file was added to .dockerignore too.
+
+
