@@ -513,3 +513,72 @@
 5) .enf file was added to .dockerignore too.
 
 
+### Nginx setting
+1) Add nginx/default.conf. 
+   ```
+      server {
+         listen 80;
+         location /api {
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            
+            proxy_set_header Host $http_host;
+            proxy_set_header X-NginX-Proxy true;
+            proxy_pass http://api:3000;
+            proxy_redirect off;
+         }
+      }
+   ```
+   From above, the 'api' in proxy_pass line is the api service name in the docker-compose.yml. Adjust the name according to the project service name.
+
+2) Add nginx service to docker-compose.yml
+   ```diff
+      version: '3.9'
+      services:
+      +  nginx:
+      +     image: nginx:stable-alpine
+      +     ports:
+      +        - 3000:80
+      +     volumes:
+      +        - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+         api:
+            build: 
+               context: ./api
+      +     # ports:
+      +     #   - ${HOST_PORT}:${NODE_PORT}
+            volumes:
+               - ./api:/app
+               - /app/node_modules
+   ```
+
+3) Modify index.js
+   ```diff
+      // express setup
+      const express = require('express')
+      const app = express()
+
+      app.use(express.json())
+   +  app.enable('trust proxy')
+   ```
+
+   ```diff
+      // routes
+      app.get('/', (req, res) => {
+      res.status(200).json({
+         status: 'success',
+         message: 'Hello World'
+      })
+      })
+
+   +  const os = require('os')
+   +  app.get('/api/v1', (req,res)=>{
+   +     res.send(`<h1>${os.hostname()} : Hello world</h1>`)
+   +  })
+   ```
+
+4) run 'docker compose up -d --build --scale api=3'
+
+5) run 'curl localhost:3000/api/v1' or 'curl [ip address]:3000/api/v1' to check if the nginx is working with load balancing.
+
+
