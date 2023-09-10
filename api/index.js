@@ -78,7 +78,7 @@ app.get('/', (req, res) => {
 
 const os = require('os')
 app.get('/api/v1', (req,res)=>{
-	res.send(`<h1>${os.hostname()} : Hello world</h1>`)
+	res.send(`<h1>${os.hostname()} : Hello world</h1>\n`)
 })
 
 const postRouter = require('./routes/postRouter')

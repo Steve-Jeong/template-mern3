@@ -592,3 +592,25 @@
    +     depends_on:
    +        - api
    ```
+
+7) Make the nginx load balancing as below and check the output if the load balancing is working
+   ```bash
+      curl localhost:3000/api/v1
+      curl localhost:3000/api/v1
+      curl localhost:3000/api/v1
+      curl localhost:3000/api/v1
+      curl localhost:3000/api/v1
+      curl localhost:3000/api/v1
+   ```
+   If you want to test the above script in the other computer in the same network, find out the ip address of the server using 'hostname -I', make the same script is the other computer and replace the localhost with the ip address found aforementioned.
+
+   One example would be like the one below:
+   ```bash
+      curl http://192.168.5.131:3000/api/v1
+      curl http://192.168.5.131:3000/api/v1
+      curl http://192.168.5.131:3000/api/v1
+      curl http://192.168.5.131:3000/api/v1
+      curl http://192.168.5.131:3000/api/v1
+      curl http://192.168.5.131:3000/api/v1
+   ```
+
