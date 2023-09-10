@@ -614,3 +614,13 @@
       curl http://192.168.5.131:3000/api/v1
    ```
 
+
+### CORS(Cross-Origin Resource Sharing) setting
+1) Add cors module in the api container
+   ```bash
+      docker exec -it mern-api-1 sh
+      npm i cors
+   ```
+
+2) Include relevant code into the index.js file in the api directory
+
