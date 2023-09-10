@@ -32,6 +32,9 @@ const app = express()
 app.use(express.json())
 app.enable('trust proxy')
 
+const cors = require('cors')
+app.use(cors())
+
 
 // connect to Redis
 const redis = require('redis')
