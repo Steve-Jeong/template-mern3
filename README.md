@@ -581,4 +581,14 @@
 
 5) run 'curl localhost:3000/api/v1' or 'curl [ip address]:3000/api/v1' to check if the nginx is working with load balancing.
 
-
+6) Add 'depends_on' in the nginx service for nginx to depend on api service. Without this, 5) above may not work with load balancing.
+   ```diff
+     nginx:
+         image: nginx:stable-alpine
+         ports:
+            - 3000:80
+         volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+   +     depends_on:
+   +        - api
+   ```
