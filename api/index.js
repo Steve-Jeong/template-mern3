@@ -30,6 +30,7 @@ const express = require('express')
 const app = express()
 
 app.use(express.json())
+app.enable('trust proxy')
 
 
 // connect to Redis
@@ -73,6 +74,11 @@ app.get('/', (req, res) => {
     status: 'success',
     message: 'Hello World'
   })
+})
+
+const os = require('os')
+app.get('/api/v1', (req,res)=>{
+	res.send(`<h1>${os.hostname()} : Hello world</h1>`)
 })
 
 const postRouter = require('./routes/postRouter')
