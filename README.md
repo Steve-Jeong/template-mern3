@@ -624,3 +624,34 @@
 
 2) Include relevant code into the index.js file in the api directory
 
+
+### Server variables setup for security
+1) Change the server environment variable setup as shown below
+   Before
+   ```before
+     mongodb:
+      image: mongo:6
+      environment:
+         - MONGO_INITDB_ROOT_USERNAME=sanjeev
+         - MONGO_INITDB_ROOT_PASSWORD=mypassword
+      volumes:
+         - mongo-db:/data/db
+   ```
+
+   After
+   ```after
+     mongodb:
+      image: mongo:6
+      environment:
+         - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+         - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      volumes:
+         - mongo-db:/data/db
+   ```
+
+2) Put the above environment variables in the .env file
+   ```
+      MONGO_INITDB_ROOT_USERNAME=sanjeev
+      MONGO_INITDB_ROOT_PASSWORD=mypassword
+   ```
+
